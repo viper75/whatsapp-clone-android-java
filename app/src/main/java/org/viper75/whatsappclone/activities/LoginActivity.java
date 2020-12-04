@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseUser;
 
@@ -20,6 +21,8 @@ public class LoginActivity extends AppCompatActivity {
 
         mLoginActivityLayoutBinding = LoginActivityLayoutBinding.inflate(getLayoutInflater());
         setContentView(mLoginActivityLayoutBinding.getRoot());
+
+        initializeViews();
     }
 
     @Override
@@ -29,6 +32,11 @@ public class LoginActivity extends AppCompatActivity {
         if (mCurrentUser != null) {
             sendUserToMainActivity();
         }
+    }
+
+    private void initializeViews() {
+        TextView needAnAccount = mLoginActivityLayoutBinding.needAnAccountTv;
+        needAnAccount.setOnClickListener(v -> startActivity(new Intent(this, RegisterActivity.class)));
     }
 
     private void sendUserToMainActivity() {
