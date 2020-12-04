@@ -16,6 +16,8 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import org.viper75.whatsappclone.R;
 import org.viper75.whatsappclone.databinding.LoginActivityLayoutBinding;
@@ -78,7 +80,7 @@ public class LoginActivity extends AppCompatActivity {
                     progressDialog.dismiss();
 
                     if (task.isSuccessful()) {
-                        startActivity(new Intent(this, MainActivity.class));
+                        sendUserToMainActivity();
                         Toast.makeText(this, "Logged in successfully!", Toast.LENGTH_SHORT).show();
                     } else {
                         String message = Objects.requireNonNull(task.getException()).getMessage();
@@ -87,5 +89,12 @@ public class LoginActivity extends AppCompatActivity {
                                 BaseTransientBottomBar.LENGTH_LONG).show();
                     }
                 });
+    }
+
+    private void sendUserToMainActivity() {
+        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 }

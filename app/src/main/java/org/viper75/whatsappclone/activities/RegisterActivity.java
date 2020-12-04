@@ -15,6 +15,8 @@ import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import org.viper75.whatsappclone.R;
 import org.viper75.whatsappclone.databinding.RegisterActivityLayoutBinding;
@@ -28,6 +30,7 @@ public class RegisterActivity extends AppCompatActivity {
     private TextInputEditText mEmailInput;
     private TextInputEditText mPasswordInput;
     private FirebaseAuth mFirebaseAuth;
+    private DatabaseReference mDatabaseReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,8 +39,8 @@ public class RegisterActivity extends AppCompatActivity {
         mRegisterActivityLayoutBinding = RegisterActivityLayoutBinding.inflate(getLayoutInflater());
         setContentView(mRegisterActivityLayoutBinding.getRoot());
 
-        //Getting instance of firebase auth
         mFirebaseAuth = FirebaseAuth.getInstance();
+        mDatabaseReference = FirebaseDatabase.getInstance().getReference();
 
         initializeViews();
     }
@@ -80,7 +83,11 @@ public class RegisterActivity extends AppCompatActivity {
                     progressDialog.dismiss();
 
                     if (task.isSuccessful()) {
-                        startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
+                        String userId = Objects.requireNonNull(mFirebaseAuth.getCurrentUser()).getUid();
+
+                        mDatabaseReference.child("Users").child(userId).setValue("");
+
+                        sendUserToMainActivity();
                         Toast.makeText(this, "Account created successfully!", Toast.LENGTH_SHORT).show();
                     } else {
                         String message = Objects.requireNonNull(task.getException()).getMessage();
@@ -89,5 +96,12 @@ public class RegisterActivity extends AppCompatActivity {
                                 BaseTransientBottomBar.LENGTH_LONG).show();
                     }
                 });
+    }
+
+    private void sendUserToMainActivity() {
+        Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 }
