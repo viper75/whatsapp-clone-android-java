@@ -27,7 +27,6 @@ public class LoginActivity extends AppCompatActivity {
 
     private LoginActivityLayoutBinding mLoginActivityLayoutBinding;
     private FirebaseAuth mFirebaseAuth;
-    private FirebaseUser mCurrentUser;
     private TextInputEditText mEmailInput;
     private TextInputEditText mPasswordInput;
 
@@ -39,18 +38,8 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(mLoginActivityLayoutBinding.getRoot());
 
         mFirebaseAuth = FirebaseAuth.getInstance();
-        mCurrentUser = mFirebaseAuth.getCurrentUser();
 
         initializeViews();
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        if (mCurrentUser != null) {
-            startActivity(new Intent(this, MainActivity.class));
-        }
     }
 
     private void initializeViews() {
