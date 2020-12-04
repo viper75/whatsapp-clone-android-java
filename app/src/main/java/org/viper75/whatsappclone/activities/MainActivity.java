@@ -7,8 +7,10 @@ import androidx.viewpager.widget.ViewPager;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.google.android.material.tabs.TabLayout;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import org.viper75.whatsappclone.R;
@@ -20,6 +22,7 @@ import java.util.Objects;
 public class MainActivity extends AppCompatActivity {
 
     private MainActivityLayoutBinding mMainActivityLayoutBinding;
+    private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mCurrentUser;
 
     @Override
@@ -28,6 +31,9 @@ public class MainActivity extends AppCompatActivity {
 
         mMainActivityLayoutBinding = MainActivityLayoutBinding.inflate(getLayoutInflater());
         setContentView(mMainActivityLayoutBinding.getRoot());
+
+        mFirebaseAuth = FirebaseAuth.getInstance();
+        mCurrentUser = mFirebaseAuth.getCurrentUser();
 
         //Initialize layout views
         initializeViews();

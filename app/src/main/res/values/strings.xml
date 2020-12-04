@@ -2,4 +2,6 @@
     <string name="app_name">WhatsApp</string>
     <string name="creating_account_description">Please wait while we create your account. This may take a few seconds</string>
     <string name="creating_account_title">Creating account</string>
+    <string name="signing_in">Signing In</string>
+    <string name="please_wait">Please wait…</string>
 </resources>
