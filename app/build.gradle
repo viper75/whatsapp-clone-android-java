@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services'
 
 android {
     compileSdkVersion 30
@@ -39,6 +40,14 @@ dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.12'
     annotationProcessor 'org.projectlombok:lombok:1.18.12'
 
+    /**Firebase Auth */
+    implementation 'com.google.firebase:firebase-auth:20.0.1'
+
+    /**Firebase Realtime Database*/
+    implementation 'com.google.firebase:firebase-database:19.5.1'
+
+    /**Firebase Storage*/
+    implementation 'com.google.firebase:firebase-storage:19.2.0'
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
