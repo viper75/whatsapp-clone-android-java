@@ -14,6 +14,11 @@ import android.view.MenuItem;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.viper75.whatsappclone.R;
 import org.viper75.whatsappclone.adapters.OptionsTabAdapter;
@@ -26,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
     private MainActivityLayoutBinding mMainActivityLayoutBinding;
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mCurrentUser;
+    private DatabaseReference mDatabaseReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
 
         mFirebaseAuth = FirebaseAuth.getInstance();
         mCurrentUser = mFirebaseAuth.getCurrentUser();
+        mDatabaseReference = FirebaseDatabase.getInstance().getReference();
 
         //Initialize layout views
         initializeViews();
@@ -47,6 +54,8 @@ public class MainActivity extends AppCompatActivity {
 
         if (mCurrentUser == null) {
             startActivity(new Intent(this, LoginActivity.class));
+        } else {
+            checkIfUserProfileSet();
         }
     }
 
@@ -60,7 +69,9 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.main_find_friends_action:
+                break;
             case R.id.main_settings_action:
+                startActivity(new Intent(this, SettingsActivity.class));
                 break;
             case R.id.main_logout_action:
                 mFirebaseAuth.signOut();
@@ -68,6 +79,30 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void checkIfUserProfileSet() {
+        String uid = mCurrentUser.getUid();
+        mDatabaseReference.child("Users").child(uid).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (!snapshot.child("username").exists()) {
+                    sendUserToSettingsActivity();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void sendUserToSettingsActivity() {
+        Intent intent = new Intent(this, SettingsActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 
     private void initializeViews() {
