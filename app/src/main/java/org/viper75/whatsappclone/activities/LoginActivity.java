@@ -53,6 +53,12 @@ public class LoginActivity extends AppCompatActivity {
 
         Button loginBtn = mLoginActivityLayoutBinding.loginBtn;
         loginBtn.setOnClickListener(this::login);
+
+        Button signInWithPhoneBtn = mLoginActivityLayoutBinding.signInWithPhoneBtn;
+        signInWithPhoneBtn.setOnClickListener(v -> {
+            Intent intent = new Intent(this, PhoneLoginActivity.class);
+            startActivity(intent);
+        });
     }
 
     private void login(View view) {

@@ -10,4 +10,8 @@
     <string name="create_group">Create Group</string>
     <string name="enter_message">Enter message...</string>
     <string name="send_btn">Send Btn</string>
+    <string name="send_verification_code">Send verification code</string>
+    <string name="verify_number">Verify number</string>
+    <string name="phone_number">Phone number</string>
+    <string name="verification_code">Verification Code</string>
 </resources>
