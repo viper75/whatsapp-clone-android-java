@@ -1,5 +1,6 @@
 package org.viper75.whatsappclone.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -8,6 +9,7 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -53,6 +55,14 @@ public class GroupsFragment extends Fragment {
         mGroupsListAdapter = new ArrayAdapter<>(Objects.requireNonNull(getContext()),
                 android.R.layout.simple_list_item_1, mGroupsList);
         groupsLv.setAdapter(mGroupsListAdapter);
+
+        groupsLv.setOnItemClickListener((parent, view, position, id) -> {
+            String groupName = parent.getItemAtPosition(position).toString();
+
+            Intent intent = new Intent(getContext(), GroupChatsActivity.class);
+            intent.putExtra(GroupChatsActivity.EXTRA_GROUP_NAME, groupName);
+            startActivity(intent);
+        });
     }
 
     private void retrieveGroups() {
