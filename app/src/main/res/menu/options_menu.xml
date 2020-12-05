@@ -6,6 +6,10 @@
         android:title="@string/find_friends"
         app:showAsAction="never"/>
 
+    <item android:id="@+id/main_create_group_action"
+        android:title="@string/create_group"
+        app:showAsAction="never"/>
+
     <item android:id="@+id/main_settings_action"
         android:title="@string/settings"
         app:showAsAction="never"/>

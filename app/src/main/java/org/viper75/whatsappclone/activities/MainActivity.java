@@ -1,6 +1,7 @@
 package org.viper75.whatsappclone.activities;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentPagerAdapter;
@@ -8,10 +9,13 @@ import androidx.viewpager.widget.ViewPager;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -70,6 +74,9 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.main_find_friends_action:
                 break;
+            case R.id.main_create_group_action:
+                showCreateGroupDialog();
+                break;
             case R.id.main_settings_action:
                 startActivity(new Intent(this, SettingsActivity.class));
                 break;
@@ -79,6 +86,40 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void showCreateGroupDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Create new Group");
+
+        final TextInputEditText groupTitle = new TextInputEditText(this);
+        groupTitle.setHint("Group name");
+        builder.setView(groupTitle);
+
+        builder.setPositiveButton("Create", (dialog, which) -> {
+            String groupName = Objects.requireNonNull(groupTitle.getText()).toString();
+
+            if (TextUtils.isEmpty(groupName)) {
+                groupTitle.setError("Group name is required.");
+                return;
+            }
+
+            createGroup(groupName);
+        });
+
+        builder.setNegativeButton("Cancel", ((dialog, which) -> dialog.dismiss()));
+
+        builder.show();
+    }
+
+    private void createGroup(String groupName) {
+        mDatabaseReference.child("Groups").child(groupName).setValue("").addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                Toast.makeText(this, "Group created successfully", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "Failed to create group", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void checkIfUserProfileSet() {
