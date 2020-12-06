@@ -73,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.main_find_friends_action:
+                startActivity(new Intent(this, FindFriendsActivity.class));
                 break;
             case R.id.main_create_group_action:
                 showCreateGroupDialog();

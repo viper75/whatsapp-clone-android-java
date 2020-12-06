@@ -55,6 +55,9 @@ dependencies {
     /**Firebase Realtime Database*/
     implementation 'com.google.firebase:firebase-database:19.5.1'
 
+    /** FirebaseUI for Firebase Realtime Database */
+    implementation 'com.firebaseui:firebase-ui-database:6.4.0'
+
     /**Firebase Storage*/
     implementation 'com.google.firebase:firebase-storage:19.2.0'
 
