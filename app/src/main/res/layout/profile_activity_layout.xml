@@ -45,7 +45,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="32dp"
         android:background="@color/colorPrimaryDark"
-        android:text="Send Message"
+        android:text="Send Friend Request"
         android:textColor="@color/colorAccent"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"

@@ -4,8 +4,13 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -24,9 +29,12 @@ public class ProfileActivity extends AppCompatActivity {
 
     private ProfileActivityLayoutBinding mProfileActivityLayoutBinding;
     private DatabaseReference mUserDBRef;
+    private FirebaseUser mCurrentUser;
     private CircleImageView mProfileImage;
     private TextView mUsername;
     private TextView mStatus;
+    private Button mRequestBtn;
+    private String uid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,9 +43,10 @@ public class ProfileActivity extends AppCompatActivity {
         mProfileActivityLayoutBinding = ProfileActivityLayoutBinding.inflate(getLayoutInflater());
         setContentView(mProfileActivityLayoutBinding.getRoot());
 
-        String uid = Objects.requireNonNull(getIntent().getExtras()).getString(EXTRA_PROFILE_UID);
+        uid = Objects.requireNonNull(getIntent().getExtras()).getString(EXTRA_PROFILE_UID);
         assert uid != null;
         mUserDBRef = FirebaseDatabase.getInstance().getReference().child("Users").child(uid);
+        mCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
 
         initializeViews();
 
@@ -48,6 +57,11 @@ public class ProfileActivity extends AppCompatActivity {
         mProfileImage = mProfileActivityLayoutBinding.profileImageCiv;
         mUsername = mProfileActivityLayoutBinding.profileUsernameTv;
         mStatus = mProfileActivityLayoutBinding.profileStatusTv;
+        mRequestBtn = mProfileActivityLayoutBinding.profileSendMessageBtn;
+
+        if (mCurrentUser.getUid().equals(uid)) {
+            mRequestBtn.setVisibility(View.INVISIBLE);
+        }
     }
 
     private void retrieveUserInfo() {

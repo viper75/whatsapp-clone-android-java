@@ -10,6 +10,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString
 public class Contact {
+    private String uid;
     private String username;
     private String status;
     private String image;
