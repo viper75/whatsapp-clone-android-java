@@ -2,65 +2,102 @@ package org.viper75.whatsappclone.activities;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import org.viper75.whatsappclone.R;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link ContactsFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import org.viper75.whatsappclone.adapters.ContactsAdapter;
+import org.viper75.whatsappclone.databinding.ContactsFragmentLayoutBinding;
+import org.viper75.whatsappclone.models.Contact;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
 public class ContactsFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public ContactsFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ContactsFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static ContactsFragment newInstance(String param1, String param2) {
-        ContactsFragment fragment = new ContactsFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
+    private ContactsAdapter mContactsAdapter;
+    private DatabaseReference mContactsDBRef;
+    private DatabaseReference mUserssDBRef;
+    private FirebaseUser mCurrentUser;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.contacts_fragment_layout, container, false);
+
+        mCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
+        mContactsDBRef = FirebaseDatabase.getInstance().getReference().child("Contacts").child(mCurrentUser.getUid());
+        mUserssDBRef = FirebaseDatabase.getInstance().getReference().child("Users");
+
+        ContactsFragmentLayoutBinding contactsFragmentLayoutBinding = ContactsFragmentLayoutBinding
+                .inflate(inflater, container, false);
+
+        mContactsAdapter = new ContactsAdapter(requireActivity());
+
+        contactsFragmentLayoutBinding.getRoot().setAdapter(mContactsAdapter);
+        contactsFragmentLayoutBinding.getRoot().setLayoutManager(new LinearLayoutManager(requireActivity()));
+
+        retrieveContacts();
+
+        return contactsFragmentLayoutBinding.getRoot();
+    }
+
+    private void retrieveContacts() {
+
+        mContactsDBRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    String key = dataSnapshot.getKey();
+
+                    mUserssDBRef.child(key).addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            String uid = (String) snapshot.child("uid").getValue();
+                            String username = (String) snapshot.child("username").getValue();
+                            String status = (String) snapshot.child("status").getValue();
+
+                            Contact contact = Contact.builder()
+                                    .username(username)
+                                    .uid(uid)
+                                    .status(status)
+                                    .build();
+
+                            if (snapshot.child("image").exists()) {
+                                String image = (String) snapshot.child("image").getValue();
+                                contact.setImage(image);
+                            }
+
+                            mContactsAdapter.addContact(contact);
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 }

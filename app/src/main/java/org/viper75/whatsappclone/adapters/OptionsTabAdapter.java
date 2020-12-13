@@ -8,6 +8,7 @@ import androidx.fragment.app.FragmentPagerAdapter;
 
 import org.viper75.whatsappclone.activities.ChatsFragment;
 import org.viper75.whatsappclone.activities.ContactsFragment;
+import org.viper75.whatsappclone.activities.FriendRequestsFragment;
 import org.viper75.whatsappclone.activities.GroupsFragment;
 
 public class OptionsTabAdapter extends FragmentPagerAdapter {
@@ -25,6 +26,8 @@ public class OptionsTabAdapter extends FragmentPagerAdapter {
                 return new GroupsFragment();
             case 2:
                 return new ContactsFragment();
+            case 3:
+                return new FriendRequestsFragment();
             default:
                 return null;
         }
@@ -40,6 +43,8 @@ public class OptionsTabAdapter extends FragmentPagerAdapter {
                 return "Groups";
             case 2:
                 return "Contacts";
+            case 3:
+                return "Requests";
             default:
                 return super.getPageTitle(position);
         }
@@ -47,6 +52,6 @@ public class OptionsTabAdapter extends FragmentPagerAdapter {
 
     @Override
     public int getCount() {
-        return 3;
+        return 4;
     }
 }
