@@ -31,11 +31,13 @@ public class ProfileActivity extends AppCompatActivity {
     private ProfileActivityLayoutBinding mProfileActivityLayoutBinding;
     private DatabaseReference mUserDBRef;
     private DatabaseReference mFriendRequestsDBRef;
+    private DatabaseReference mContactsDBRef;
     private FirebaseUser mCurrentUser;
     private CircleImageView mProfileImage;
     private TextView mUsername;
     private TextView mStatus;
     private Button mRequestBtn;
+    private Button mCancelRequestBtn;
     private RequestStatus mRequestStatus = RequestStatus.NEW;
     private String uid;
 
@@ -50,6 +52,7 @@ public class ProfileActivity extends AppCompatActivity {
         assert uid != null;
         mUserDBRef = FirebaseDatabase.getInstance().getReference().child("Users").child(uid);
         mFriendRequestsDBRef = FirebaseDatabase.getInstance().getReference().child("Chat Requests");
+        mContactsDBRef = FirebaseDatabase.getInstance().getReference().child("Contacts");
         mCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
 
         initializeViews();
@@ -62,10 +65,13 @@ public class ProfileActivity extends AppCompatActivity {
         mUsername = mProfileActivityLayoutBinding.profileUsernameTv;
         mStatus = mProfileActivityLayoutBinding.profileStatusTv;
         mRequestBtn = mProfileActivityLayoutBinding.profileSendMessageBtn;
+        mCancelRequestBtn = mProfileActivityLayoutBinding.declineMessageRequestBtn;
 
         if (mCurrentUser.getUid().equals(uid)) {
             mRequestBtn.setVisibility(View.INVISIBLE);
         }
+
+        mCancelRequestBtn.setOnClickListener(v -> cancelFriendRequest());
 
         mRequestBtn.setOnClickListener(v -> {
             switch (mRequestStatus) {
@@ -74,6 +80,12 @@ public class ProfileActivity extends AppCompatActivity {
                     break;
                 case REQUEST_SENT:
                     cancelFriendRequest();
+                    break;
+                case REQUEST_RECEIVED:
+                    acceptFriendRequest();
+                    break;
+                case FRIENDS:
+                    deleteContact();
                     break;
             }
         });
@@ -101,6 +113,42 @@ public class ProfileActivity extends AppCompatActivity {
                    if (task1.isSuccessful()) {
                        mRequestBtn.setText("Send Friend Request");
                        mRequestStatus = RequestStatus.NEW;
+                       mCancelRequestBtn.setVisibility(View.INVISIBLE);
+                   }
+                });
+            }
+        });
+    }
+
+    private void acceptFriendRequest() {
+        mContactsDBRef.child(mCurrentUser.getUid()).child(uid).setValue("").addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                mContactsDBRef.child(uid).child(mCurrentUser.getUid()).setValue("").addOnCompleteListener(task1 -> {
+                   if (task1.isSuccessful()) {
+                       mFriendRequestsDBRef.child(mCurrentUser.getUid()).child(uid).removeValue().addOnCompleteListener(task2 -> {
+                           if (task2.isSuccessful()) {
+                               mFriendRequestsDBRef.child(uid).child(mCurrentUser.getUid()).removeValue().addOnCompleteListener(task3 -> {
+                                   if (task3.isSuccessful()) {
+                                       mRequestBtn.setText("Delete this Contact");
+                                       mRequestStatus = RequestStatus.FRIENDS;
+                                       mCancelRequestBtn.setVisibility(View.INVISIBLE);
+                                   }
+                               });
+                           }
+                       });
+                   }
+                });
+            }
+        });
+    }
+
+    private void deleteContact() {
+        mContactsDBRef.child(mCurrentUser.getUid()).child(uid).removeValue().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                mContactsDBRef.child(uid).child(mCurrentUser.getUid()).removeValue().addOnCompleteListener(task1 -> {
+                   if (task1.isSuccessful()) {
+                       mRequestBtn.setText("Send friend request");
+                       mRequestStatus = RequestStatus.NEW;
                    }
                 });
             }
@@ -120,6 +168,53 @@ public class ProfileActivity extends AppCompatActivity {
                 if (snapshot.child("image").exists()) {
                     String imageUrl = (String) snapshot.child("image").getValue();
                     Picasso.get().load(imageUrl).into(mProfileImage);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        mFriendRequestsDBRef.child(mCurrentUser.getUid()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.child(uid).exists()) {
+                    String requestStatusStr = (String) snapshot.child(uid).child("request_status").getValue();
+                    RequestStatus requestStatus = Enum.valueOf(RequestStatus.class, requestStatusStr);
+
+                    switch (requestStatus) {
+                        case REQUEST_SENT:
+                            mRequestBtn.setText("Cancel friend request");
+                            mRequestStatus = RequestStatus.REQUEST_SENT;
+                            break;
+                        case REQUEST_RECEIVED:
+                            mRequestBtn.setText("Accept Friend Request");
+                            mRequestStatus = RequestStatus.REQUEST_RECEIVED;
+                            mCancelRequestBtn.setVisibility(View.VISIBLE);
+                            break;
+                        case NEW:
+                            mRequestBtn.setText("Send friend request");
+                            mRequestStatus = RequestStatus.NEW;
+                            break;
+                    }
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        mContactsDBRef.child(mCurrentUser.getUid()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.child(uid).exists()) {
+                    mRequestBtn.setText("Delete this Contact");
+                    mRequestStatus = RequestStatus.FRIENDS;
                 }
             }
 

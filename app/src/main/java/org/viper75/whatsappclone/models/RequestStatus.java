@@ -4,4 +4,5 @@ public enum RequestStatus {
     NEW,
     REQUEST_SENT,
     REQUEST_RECEIVED,
+    FRIENDS
 }

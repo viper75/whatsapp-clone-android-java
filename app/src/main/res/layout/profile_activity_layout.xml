@@ -43,12 +43,27 @@
         android:id="@+id/profile_send_message_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="32dp"
+        android:layout_marginBottom="8dp"
         android:background="@color/colorPrimaryDark"
         android:text="Send Friend Request"
         android:textColor="@color/colorAccent"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
+        app:layout_constraintLeft_toLeftOf="@id/profile_image_civ"
+        app:layout_constraintRight_toRightOf="@id/profile_image_civ"
+        app:layout_constraintBottom_toTopOf="@id/decline_message_request_btn"/>
+
+    <Button
+        android:id="@+id/decline_message_request_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
+        android:background="@color/colorAccent"
+        android:text="Decline Friend Request"
+        android:textColor="@color/colorPrimary"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:visibility="invisible"
         app:layout_constraintLeft_toLeftOf="@id/profile_image_civ"
         app:layout_constraintRight_toRightOf="@id/profile_image_civ"
         app:layout_constraintBottom_toBottomOf="parent"/>
