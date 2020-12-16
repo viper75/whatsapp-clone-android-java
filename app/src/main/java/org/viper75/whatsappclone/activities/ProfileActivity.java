@@ -121,9 +121,9 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void acceptFriendRequest() {
-        mContactsDBRef.child(mCurrentUser.getUid()).child(uid).setValue("").addOnCompleteListener(task -> {
+        mContactsDBRef.child(mCurrentUser.getUid()).child(uid).child("Contacts").setValue("saved").addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
-                mContactsDBRef.child(uid).child(mCurrentUser.getUid()).setValue("").addOnCompleteListener(task1 -> {
+                mContactsDBRef.child(uid).child(mCurrentUser.getUid()).child("Contacts").setValue("saved").addOnCompleteListener(task1 -> {
                    if (task1.isSuccessful()) {
                        mFriendRequestsDBRef.child(mCurrentUser.getUid()).child(uid).removeValue().addOnCompleteListener(task2 -> {
                            if (task2.isSuccessful()) {
